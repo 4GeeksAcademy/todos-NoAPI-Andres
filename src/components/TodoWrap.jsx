@@ -34,7 +34,7 @@ const TodoWrap = () => {
       {todos.map((todo, index) => (
         <Todo task={todo} key={todo.id} toggleComplete={toggleComplete} deleteTodo={deleteTodo}/>
       ))}
-      {/* Mensaje de no hay tareas o número de tareas pendientes */}
+      {/* Mensaje de no hay tareas o número de pendientes */}
       {todos.length === 0 ? (
         <p>No tasks pending. Enjoy your day!</p>
       ) : (
