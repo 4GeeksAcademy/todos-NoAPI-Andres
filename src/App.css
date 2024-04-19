@@ -1,0 +1,106 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins&display=swap');
+
+.App {
+  text-align: center;
+}
+
+
+.App-header {
+  background-color: #282c34;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: calc(10px + 2vmin);
+  color: white;
+}
+
+.TodoForm {
+  width: 100%;
+  margin-bottom: 0.75rem;
+}
+
+* {
+  font-family: 'Poppins';
+  font-weight: bold;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+.TodoWrap {
+  background: #1abb93;
+  margin-top: 5rem;
+  padding: 2rem;
+  border-radius: 5px;
+}
+
+.todo-button {
+  background: #f59619;
+  color: #fff;
+  border: none;
+  padding: 0.55rem;
+  cursor: pointer;
+}
+
+.todo-input {
+  outline: none;
+  background: none;
+  border: 1px solid #830d9b;
+  padding: 0.5rem 1rem;
+  margin-top: 1rem;
+  margin-bottom: 2rem;
+  width: 300px;
+  color: #fff;
+}
+
+
+h1 {
+  color: #fff;
+  margin-bottom: 1rem;
+
+}
+
+body {
+  padding-top: 5rem;
+  background: #070e04;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* * {
+  font-family: 'Poppins', sans-serif;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+
+
+.todo-input::placeholder {
+  color: #ffffff4d;
+}
+
+
+.fa-trash {
+  margin-left: 0.75rem;
+}
+
+.incompleted {
+  color: #fff;
+  cursor: pointer;
+}
+
+.completed {
+  color: #c5aeff;
+  text-decoration: line-through;
+  cursor: pointer;
+}
+
+.edit-icon,
+.delete-icon {
+  cursor: pointer;
+} */
+ 
