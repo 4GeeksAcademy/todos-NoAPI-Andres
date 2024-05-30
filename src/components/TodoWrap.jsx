@@ -7,23 +7,54 @@ const TodoWrap = () => {
   const [todos, setTodos] = useState([]);
 
   useEffect(() => {
-    console.log(todos);
-  }, [todos]);
+    // Fetch the initial data from the server
+    fetch('https://playground.4geeks.com/todos/users')
+      .then(response => response.json())
+      .then(data => setTodos(data))
+      .catch(error => console.error('Error fetching data:', error));
+  }, []);
 
-  const addTodo = todo => {
+  const addTodo = async todo => {
     if (todo.trim() !== "") {
-      setTodos(prevTodos => [...prevTodos, {id: uuidv4(), task: todo, completed: false, isEditing: false}]);
+      const response = await fetch('https://playground.4geeks.com/todos/{user_name}', {
+        method: 'POST',
+        headers: {
+          'Content-Type': application/json
+        },
+        body: JSON.stringify({ username: '{user_name}', task: todo})
+      });
+      const newTodo = await response.json();
+      setTodos(prevTodos => [...prevTodos, newTodo]);
     }
   };
 
-  const toggleComplete = id => {
-    setTodos(todos.map(todo => todo.id === id ? {...todo, completed: !todo.completed} : todo));
+  const toggleComplete = async todo => {
+    if (todo.trim() !== "") {
+      const response = await fetch('https://playground.4geeks.com/todos/{todo_id}', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': application/json
+        },
+        body: JSON.stringify({ username: '{todo_id}', task: todo})
+      });
+      const newTodo = await response.json();
+      setTodos(prevTodos => [...prevTodos, newTodo]);
+    }
   };
 
-  const deleteTodo = id => {
-    setTodos(todos.filter(todo => todo.id !== id));
+  const deleteTodo = async todo => {
+    if (todo.trim() !== "") {
+      const response = await fetch('https://playground.4geeks.com/todos/{todo_id}', {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': application/json
+        },
+        body: JSON.stringify({ username: '{todo_id}', task: todo})
+      });
+      const newTodo = await response.json();
+      setTodos(prevTodos => [...prevTodos, newTodo]);
+    }
   };
-
   // Calcular tareas no completadas
   const uncompletedCount = todos.filter(todo => !todo.completed).length;
 
