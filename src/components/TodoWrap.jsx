@@ -1,78 +1,106 @@
 import React, { useState, useEffect } from 'react';
 import TodoForm from './TodoForm.jsx';
-import { v4 as uuidv4 } from 'uuid';
 import Todo from './Todo.jsx';
 
 const TodoWrap = () => {
   const [todos, setTodos] = useState([]);
+  const [error, setError] = useState(null);
+  const userName = 'test_user';  // Replace with actual user name if available
 
   useEffect(() => {
     // Fetch the initial data from the server
-    fetch('https://playground.4geeks.com/todos/users')
-      .then(response => response.json())
-      .then(data => setTodos(data))
-      .catch(error => console.error('Error fetching data:', error));
-  }, []);
+    fetch(`https://playground.4geeks.com/todos/users/${userName}`)
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('User not found');
+        }
+        return response.json();
+      })
+      .then(data => setTodos(data.todos))
+      .catch(error => {
+        console.error('Error fetching data:', error);
+        setTodos([]);  // Ensure todos is an array even if there's an error
+        setError(error.message);
+      });
+  }, [userName]);
 
-  const addTodo = async todo => {
-    if (todo.trim() !== "") {
-      const response = await fetch('https://playground.4geeks.com/todos/{user_name}', {
+  const addTodo = async label => {
+    if (label.trim() !== "") {
+      const response = await fetch('https://playground.4geeks.com/todos/todo', {
         method: 'POST',
         headers: {
-          'Content-Type': application/json
+          'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ username: '{user_name}', task: todo})
+        body: JSON.stringify({ user_name: userName, label, is_done: false })
       });
-      const newTodo = await response.json();
-      setTodos(prevTodos => [...prevTodos, newTodo]);
+      if (response.ok) {
+        const newTodo = await response.json();
+        setTodos(prevTodos => [...prevTodos, newTodo]);
+      } else {
+        console.error('Error adding todo:', await response.json());
+      }
     }
   };
 
-  const toggleComplete = async todo => {
-    if (todo.trim() !== "") {
-      const response = await fetch('https://playground.4geeks.com/todos/{todo_id}', {
+  const toggleComplete = async id => {
+    const todo = todos.find(todo => todo.id === id);
+    if (todo) {
+      const response = await fetch(`https://playground.4geeks.com/todos/todo/${id}`, {
         method: 'PUT',
         headers: {
-          'Content-Type': application/json
+          'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ username: '{todo_id}', task: todo})
+        body: JSON.stringify({ label: todo.label, is_done: !todo.is_done })
       });
-      const newTodo = await response.json();
-      setTodos(prevTodos => [...prevTodos, newTodo]);
+      if (response.ok) {
+        const updatedTodo = await response.json();
+        setTodos(prevTodos => prevTodos.map(todo => todo.id === id ? updatedTodo : todo));
+      } else {
+        console.error('Error updating todo:', await response.json());
+      }
     }
   };
 
-  const deleteTodo = async todo => {
-    if (todo.trim() !== "") {
-      const response = await fetch('https://playground.4geeks.com/todos/{todo_id}', {
-        method: 'DELETE',
-        headers: {
-          'Content-Type': application/json
-        },
-        body: JSON.stringify({ username: '{todo_id}', task: todo})
-      });
-      const newTodo = await response.json();
-      setTodos(prevTodos => [...prevTodos, newTodo]);
+  const deleteTodo = async id => {
+    const response = await fetch(`https://playground.4geeks.com/todos/todo/${id}`, {
+      method: 'DELETE'
+    });
+    if (response.ok) {
+      setTodos(prevTodos => prevTodos.filter(todo => todo.id !== id));
+    } else {
+      console.error('Error deleting todo:', await response.json());
     }
   };
-  // Calcular tareas no completadas
-  const uncompletedCount = todos.filter(todo => !todo.completed).length;
+
+  const deleteAllTodos = async () => {
+    const response = await fetch(`https://playground.4geeks.com/todos/user/${userName}`, {
+      method: 'DELETE'
+    });
+    if (response.ok) {
+      setTodos([]);
+    } else {
+      console.error('Error deleting all todos:', await response.json());
+    }
+  };
+
+  const uncompletedCount = todos.filter(todo => !todo.is_done).length;
 
   return (
     <div className='TodoWrap'>
       <h1>This is how the day looks</h1>
-      <TodoForm addTodo={addTodo}/>
-      {todos.map((todo, index) => (
-        <Todo task={todo} key={todo.id} toggleComplete={toggleComplete} deleteTodo={deleteTodo}/>
+      {error && <p className='error'>{error}</p>}
+      <TodoForm addTodo={addTodo} />
+      {todos.map(todo => (
+        <Todo task={todo} key={todo.id} toggleComplete={toggleComplete} deleteTodo={deleteTodo} />
       ))}
-      {/* Mensaje de no hay tareas o número de pendientes */}
       {todos.length === 0 ? (
         <p>No tasks pending. Enjoy your day!</p>
       ) : (
         <p>You have {uncompletedCount} {uncompletedCount === 1 ? 'task' : 'tasks'} pending.</p>
       )}
+      <button onClick={deleteAllTodos}>Clear All Tasks</button>
     </div>
   );
-}
+};
 
 export default TodoWrap;
